@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Wijmo Example Page</title>
+    <link href="http://cdn.wijmo.com/themes/aristo/jquery-wijmo.css" rel="stylesheet" type="text/css" />
+    <link href="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.css" rel="stylesheet" type="text/css" />
+    <link href="http://cdn.wijmo.com/jquery.wijmo-complete.1.5.0.css" rel="stylesheet" type="text/css" />
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.6.2.min.js" type="text/javascript"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="http://cdn.wijmo.com/external/jquery.bgiframe-2.1.3-pre.js" type="text/javascript"></script>
+    <script src="http://cdn.wijmo.com/external/globalize.min.js" type="text/javascript"></script>
+    <script src="http://cdn.wijmo.com/external/jquery.mousewheel.min.js" type="text/javascript"></script>
+    <script src="http://cdn.wijmo.com/external/raphael.js" type="text/javascript"></script>
+    <script src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js" type="text/javascript"></script>
+    <script src="http://cdn.wijmo.com/jquery.wijmo-complete.1.5.0.min.js" type="text/javascript"></script>
+    <script id="scriptInit" type="text/javascript">
+        var xValues = [], yValues = [];
+        var randomDataValuesCount = 10;
+        var duration = 5000;
+        var idx = 0;
+        var intervalRadomData = null;
+
+        $(document).ready(function () {
+            for (idx = 0; idx < randomDataValuesCount; idx++) {
+                xValues.push(idx);
+                yValues.push(createRandomValue());
+            }
+
+            $("#wijlinechart").wijlinechart({
+                showChartLabels: false,
+                width: 756,
+                height: 475,
+                shadow: false,
+                animation: {
+                    enabled: false
+                },
+                seriesTransition: {
+                    enabled: false
+                },
+                legend: { visible: false },
+                hint: { enable: false },
+                header: { text: "Wijmo Awesomeness" },
+                axis:
+                {
+                    y: { min: 0, max: 100, autoMin: false, autoMax: false }
+                },
+                seriesList: [
+                    {
+                        data: {
+                            x: xValues,
+                            y: yValues
+                        },
+                        markers: {
+                            visible: true,
+                            type: "circle"
+                        }
+                    }
+                ],
+                seriesStyles: [{ "stroke-width": "3", stroke: "#00a6dd"}],
+                seriesHoverStyles: [{ "stroke-width": "4"}]
+
+            });
+
+            animateChart();
+
+            intervalRadomData = setInterval(function () {
+                $("#wijlinechart").wijlinechart("addSeriesPoint", 0, { x: idx++, y: createRandomValue() }, true);
+                animateChart();
+            }, duration);
+        });
+
+        function animateChart() {
+            var path = $("#wijlinechart").wijlinechart("getLinePath", 0);
+            var markers = $("#wijlinechart").wijlinechart("getLineMarkers", 0);
+            var box = path.getBBox();
+            var width = $("#wijlinechart").wijlinechart("option", "width") / 10;
+            path.animate({ translation: -width + ", 0" }, duration);
+            if (path.shadow) {
+                var pathShadow = path.shadow;
+                pathShadow.animate({ translation: -width + ", 0" }, duration);
+            }
+            markers.animate({ translation: -width + ", 0" }, duration);
+            var rect = box.x + " " + (box.y - 5) + " " + box.width + " " + (box.height + 10);
+            path.wijAttr("clip-rect", rect);
+            markers.attr("clip-rect", rect);
+        }
+
+        function createRandomValue() {
+            var val = Math.round(Math.random() * 100);
+            return val;
+        }
+
+        function dispose() {
+            if (intervalRadomData) {
+                clearInterval(intervalRadomData);
+                intervalRadomData = null;
+            }
+        }
+
+    </script>
+    <style type="text/css">
+        body
+        {
+            font-size: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div id="wijlinechart">
+        </div>
+    </div>
+</body>
+</html>
